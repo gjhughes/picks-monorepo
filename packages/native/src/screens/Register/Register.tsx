@@ -1,0 +1,125 @@
+import React from 'react'
+import {ScrollView, SafeAreaView, View} from 'react-native'
+import {NavigationStackProp} from 'react-navigation-stack'
+import {Button, TextInput, HelperText} from 'react-native-paper'
+
+import styles from './styles'
+import {useForm} from '../../hooks/useForm'
+import {useOnSubmitEditing} from '../../hooks/useOnSubmitEditing'
+import {handleRedirect} from '../../helpers/handleRedirect'
+import {useRegister} from '../../apollo/hooks'
+import writeToCache from '../../apollo/helpers/writeToCache'
+
+interface Props {
+  navigation: NavigationStackProp
+}
+
+function Register({navigation}: Props) {
+  const {values, handleChange} = useForm({
+    name: '',
+    email: '',
+    password: '',
+    passwordConfirmation: ''
+  })
+
+  const {
+    nameInput,
+    emailInput,
+    passwordInput,
+    handleNextInput,
+    confirmPasswordInput
+  } = useOnSubmitEditing('register')
+
+  const {register, registerError, registerLoading} = useRegister()
+
+  const handleRegister = async () => {
+    const {data} = await register({
+      variables: {...values}
+    })
+
+    writeToCache('loggedInUser', data.register.user.uuid)
+
+    handleRedirect(data.register, navigation)
+  }
+
+  return (
+    <SafeAreaView style={styles.container}>
+      <ScrollView
+        contentContainerStyle={styles.scrollViewContainer}
+        style={styles.scrollView}>
+        <TextInput
+          // https://github.com/callstack/react-native-paper/issues/1453
+          // @ts-ignore
+          ref={nameInput}
+          mode="outlined"
+          label="Name"
+          placeholder="Name"
+          style={styles.input}
+          value={values.name}
+          returnKeyType="next"
+          onSubmitEditing={handleNextInput}
+          onChangeText={(value: string) => handleChange('name', value)}
+        />
+        <TextInput
+          // https://github.com/callstack/react-native-paper/issues/1453
+          // @ts-ignore
+          ref={emailInput}
+          mode="outlined"
+          label="Email"
+          placeholder="Email address"
+          style={styles.input}
+          value={values.email}
+          returnKeyType="next"
+          onSubmitEditing={handleNextInput}
+          onChangeText={(value: string) => handleChange('email', value)}
+        />
+        <TextInput
+          // https://github.com/callstack/react-native-paper/issues/1453
+          // @ts-ignore
+          ref={passwordInput}
+          mode="outlined"
+          label="Password"
+          placeholder="Password"
+          style={styles.input}
+          value={values.password}
+          returnKeyType="next"
+          onSubmitEditing={handleNextInput}
+          onChangeText={(value: string) => handleChange('password', value)}
+        />
+        <TextInput
+          // https://github.com/callstack/react-native-paper/issues/1453
+          // @ts-ignore
+          ref={confirmPasswordInput}
+          mode="outlined"
+          label="Confirm password"
+          placeholder="Confirm password"
+          style={styles.input}
+          value={values.passwordConfirmation}
+          returnKeyType="done"
+          onChangeText={(value: string) =>
+            handleChange('passwordConfirmation', value)
+          }
+        />
+      </ScrollView>
+      <View style={styles.buttonWrapper}>
+        {registerError && (
+          <HelperText type="error">{registerError.message}</HelperText>
+        )}
+        <Button
+          mode="contained"
+          style={styles.button}
+          loading={registerLoading}
+          onPress={handleRegister}>
+          Register
+        </Button>
+        <Button
+          style={styles.button}
+          onPress={() => navigation.navigate('Login')}>
+          Already signed up
+        </Button>
+      </View>
+    </SafeAreaView>
+  )
+}
+
+export default Register

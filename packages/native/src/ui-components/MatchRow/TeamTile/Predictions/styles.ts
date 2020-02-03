@@ -1,0 +1,19 @@
+import {StyleSheet, TextStyle, ViewStyle} from 'react-native'
+
+interface Styles {
+  container: ViewStyle
+  text: TextStyle
+}
+
+export default StyleSheet.create<Styles>({
+  container: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  text: {
+    color: 'white',
+    fontSize: 18,
+    fontWeight: 'bold'
+  }
+})

@@ -1,0 +1,19 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "index.ts",
+      "use": "@now/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/graphql",
+      "dest": "dist/index.js"
+    }
+  ],
+  "env": {
+    "ENVIRONMENT_NAME": "@environment-name",
+    "BASE_URL": "@base-url"
+  }
+}
