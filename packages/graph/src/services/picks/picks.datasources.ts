@@ -21,7 +21,7 @@ import {
   MutationCreateLeagueArgs,
   QueryPredictionsForWeekArgs,
   MutationUpsertPredictionArgs
-} from '../../types'
+} from "../../generated"
 
 class PicksDataSource extends RESTDataSource {
   constructor() {
