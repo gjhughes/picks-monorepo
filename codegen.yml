@@ -1,0 +1,21 @@
+schema: https://picks-graph.ghughes.now.sh/
+generates:
+  packages/native/src/generated/hooks.ts:
+    documents: packages/native/src/apollo/**/*.ts
+    schema: packages/native/src/apollo/client-schema.graphql
+    plugins:
+      - typescript
+      - typescript-operations
+      - typescript-react-apollo
+    config:
+      withHooks: true
+      withMutationFn: true
+      withHOC: false
+      withComponent: false
+  packages/native/src/generated/types.ts:
+    plugins:
+      - typescript
+  packages/graph/src/generated/index.ts:
+    plugins:
+      - typescript
+      - typescript-resolvers
