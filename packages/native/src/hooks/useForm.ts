@@ -2,9 +2,9 @@ import {useState} from 'react'
 
 interface State {
   email: string
-  name?: string
+  name: string
   password: string
-  passwordConfirmation?: string
+  passwordConfirmation: string
 }
 
 export const useForm = (initialValues: State) => {
