@@ -3,3 +3,4 @@
 /packages/api/dist/
 /packages/graph/dist/
 /packages/native/ios/Pods/
+/packages/native/ios/build/
