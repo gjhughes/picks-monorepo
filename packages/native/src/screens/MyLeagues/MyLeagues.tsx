@@ -7,8 +7,7 @@ import styles from './styles'
 import {colors} from '../../theme'
 import {League} from  "../../generated/types"
 import {AppRoute} from '../../navigation/enums'
-import {useLoggedInUser} from '../../apollo/hooks'
-import {useGetUserQuery} from  "../../generated/hooks"
+import {useGetUserQuery, useLoggedInUserQuery} from  "../../generated/hooks"
 import writeToCache from '../../apollo/helpers/writeToCache'
 import userIsLeagueMember from '../../helpers/userIsLeagueMember'
 import {LeagueTile, FloatingAction, EmptyLeagueList} from '../../ui-components'
@@ -17,11 +16,11 @@ import {LeagueTile, FloatingAction, EmptyLeagueList} from '../../ui-components'
 function MyLeagues({ navigation}: any) {
   const [floatingActionVisible, setFloatingActionVisible] = useState(true)
 
-  const {loggedInUser} = useLoggedInUser()
+  const {data: localData} = useLoggedInUserQuery()
 
   const {data, loading} = useGetUserQuery({
     variables: {
-      uuid: loggedInUser
+      uuid: localData?.loggedInUser!
     }
   })
 
@@ -35,7 +34,7 @@ function MyLeagues({ navigation}: any) {
   )
 
   function renderItem({item}: {item: League}) {
-    const isMember = userIsLeagueMember(loggedInUser, item)
+    const isMember = userIsLeagueMember(localData?.loggedInUser!, item)
     return (
       <LeagueTile
         isMember={isMember}
