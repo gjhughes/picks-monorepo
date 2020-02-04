@@ -1,7 +1,16 @@
 {
   "name": "root",
   "private": true,
+  "scripts": {
+    "setup": "lerna bootstrap && yarn generate",
+    "generate": "graphql-codegen"
+  },
   "devDependencies": {
+    "@graphql-codegen/cli": "^1.8.3",
+    "@graphql-codegen/typescript": "^1.12.1",
+    "@graphql-codegen/typescript-operations": "^1.12.1",
+    "@graphql-codegen/typescript-resolvers": "^1.8.3",
+    "@graphql-codegen/typescript-react-apollo": "^1.8.3",
     "lerna": "^3.20.2"
   }
 }
