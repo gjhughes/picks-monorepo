@@ -4,6 +4,8 @@ import {ApolloProvider} from '@apollo/react-hooks'
 import {Provider as PaperProvier} from 'react-native-paper'
 import {useQuery} from 'react-apollo'
 import codePush, {CodePushOptions} from 'react-native-code-push'
+import Reactotron from 'reactotron-react-native'
+import AsyncStorage from "@react-native-community/async-storage"
 
 import client from './apollo'
 import {BootScreen} from './screens'
@@ -13,6 +15,12 @@ import {getItem} from './utils/keychain'
 import {AppRoute} from './navigation/enums'
 import teamRecordQuery from './apollo/queries/teamStandings'
 import writeToCache from './apollo/helpers/writeToCache'
+
+Reactotron
+  .setAsyncStorageHandler(AsyncStorage)
+  .configure()
+  .useReactNative()
+  .connect()
 
 const codePushOptions: CodePushOptions = {
   checkFrequency: codePush.CheckFrequency.ON_APP_START
