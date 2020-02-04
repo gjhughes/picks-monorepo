@@ -1,14 +1,15 @@
 import React from 'react'
 import {ScrollView, SafeAreaView, View} from 'react-native'
-import {TextInput, Button, Subheading, HelperText} from 'react-native-paper'
+import {TextInput, Button, HelperText} from 'react-native-paper'
 
 import styles from './styles'
 import colors from '../../theme/colors'
 import {useForm} from '../../hooks/useForm'
-import {useOnSubmitEditing} from '../../hooks/useOnSubmitEditing'
-import {useLogin} from '../../apollo/hooks'
-import writeToCache from '../../apollo/helpers/writeToCache'
+import {AppRoute} from "../../navigation/enums"
+import {useLoginMutation} from "../../generated/hooks"
 import {handleRedirect} from '../../helpers/handleRedirect'
+import writeToCache from '../../apollo/helpers/writeToCache'
+import {useOnSubmitEditing} from '../../hooks/useOnSubmitEditing'
 import {AuthNavigatorProps} from '../../navigation/AuthNavigator'
 
 function Login({navigation}: AuthNavigatorProps) {
@@ -21,16 +22,17 @@ function Login({navigation}: AuthNavigatorProps) {
     'login'
   )
 
-  const {login, authLoading, authError} = useLogin()
+  const [login, {error, loading}] = useLoginMutation()
 
   const handleLogin = async () => {
     const {data} = await login({
       variables: {...values}
     })
 
-    writeToCache('loggedInUser', data.login.user.uuid)
-
-    handleRedirect(data.login, navigation)
+    writeToCache('loggedInUser', data?.login.user!.uuid)
+    
+    // todo: fix navigation types
+    handleRedirect(data?.login!, navigation)
   }
 
   return (
@@ -65,27 +67,23 @@ function Login({navigation}: AuthNavigatorProps) {
         />
       </ScrollView>
       <View style={styles.buttonWrapper}>
-        {authError && <HelperText type="error">{authError.message}</HelperText>}
+        {error && <HelperText type="error">{error.message}</HelperText>}
         <Button
           mode="contained"
           style={styles.button}
           onPress={handleLogin}
-          loading={authLoading}>
+          loading={loading}>
           Login
         </Button>
         <Button
           color={colors.nfl.primary}
           style={styles.button}
-          onPress={() => navigation.navigate('Register')}>
+          onPress={() => navigation.navigate(AppRoute.REGISTER)}>
           Create an account
         </Button>
       </View>
     </SafeAreaView>
   )
-}
-
-Login.navigationOptions = {
-  headerTitle: () => <Subheading style={styles.title}>LOGIN</Subheading>
 }
 
 export default Login
