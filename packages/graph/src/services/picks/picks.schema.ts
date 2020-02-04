@@ -9,7 +9,7 @@ import Leaderboard from './schema/leaderboard'
 
 export default gql`
   type Query {
-    user(uuid: String!): User
+    user(uuid: String!): User!
     league(uuid: String!): League
     leagues: [League]!
     weeklySchedule(season: String!, week: String!): [WeeklySchedule]
