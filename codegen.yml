@@ -15,7 +15,9 @@ generates:
   packages/native/src/generated/types.ts:
     plugins:
       - typescript
-  packages/graph/src/generated/index.ts:
+  packages/graph/src/generated/types.ts:
     plugins:
       - typescript
       - typescript-resolvers
+    config:
+      useIndexSignature: true

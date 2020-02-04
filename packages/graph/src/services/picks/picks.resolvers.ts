@@ -1,4 +1,4 @@
-import {QueryResolvers, MutationResolvers} from '../../generated'
+import {QueryResolvers, MutationResolvers} from '../../generated/types'
 
 const queryResolvers: QueryResolvers = {
   user: async (_, args, {dataSources}) => {
