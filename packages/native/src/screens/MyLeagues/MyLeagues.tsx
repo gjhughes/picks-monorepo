@@ -71,16 +71,14 @@ function MyLeagues({ navigation}: any) {
     const {leagues} = data.user
     return (
       <>
-        {leagues.length > 0 && (
-          <FlatList<League>
-            style={styles.list}
-            data={leagues as League[]}
-            renderItem={renderItem}
-            keyExtractor={({uuid}) => String(uuid)}
-            ListFooterComponent={<View style={styles.listFooter} />}
-            ListEmptyComponent={<EmptyLeagueList />}
-          />
-        )}
+        <FlatList<League>
+          style={styles.list}
+          data={leagues as League[]}
+          renderItem={renderItem}
+          keyExtractor={({uuid}) => String(uuid)}
+          ListFooterComponent={<View style={styles.listFooter} />}
+          ListEmptyComponent={<EmptyLeagueList />}
+        />
         <FloatingAction
           // @ts-ignore
           onPress={goToModalStack}
