@@ -4,6 +4,7 @@ import {User} from "./user"
 import {generateAccessCode} from "../utils/generateAccessCode"
 
 export interface ILeague extends Document {
+  uuid: string
   name: string
   accessCode: string
   members: Types.ObjectId[]
@@ -64,7 +65,6 @@ leagueSchema
 
 leagueSchema
   .post("save", async function(this: ILeague, _, next) {
-    console.log("Post Save hook::", this)
     await User.findByIdAndUpdate(this.createdBy, {
       $push: {"leagues": this._id}
     })

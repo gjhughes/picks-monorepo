@@ -6,6 +6,6 @@ export default gql`
     name: String!
     accessCode: String!
     members: [User!]!
-    predictions: [Prediction]!
+    createdBy: User!
   }
 `
