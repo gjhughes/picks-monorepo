@@ -7,8 +7,8 @@ import styles from './styles'
 import {useForm} from '../../hooks/useForm'
 import {useOnSubmitEditing} from '../../hooks/useOnSubmitEditing'
 import {handleRedirect} from '../../helpers/handleRedirect'
-import {useRegister} from '../../apollo/hooks'
 import writeToCache from '../../apollo/helpers/writeToCache'
+import {useRegisterMutation} from "../../generated/hooks"
 
 interface Props {
   navigation: NavigationStackProp
@@ -30,16 +30,17 @@ function Register({navigation}: Props) {
     confirmPasswordInput
   } = useOnSubmitEditing('register')
 
-  const {register, registerError, registerLoading} = useRegister()
+  const [register, {loading, error}] = useRegisterMutation()
 
   const handleRegister = async () => {
     const {data} = await register({
       variables: {...values}
     })
 
-    writeToCache('loggedInUser', data.register.user.uuid)
+    writeToCache('loggedInUser', data?.register.user.uuid!)
 
-    handleRedirect(data.register, navigation)
+    // todo: fix navigation type
+    handleRedirect(data?.register!, navigation)
   }
 
   return (
@@ -57,6 +58,8 @@ function Register({navigation}: Props) {
           style={styles.input}
           value={values.name}
           returnKeyType="next"
+          autoCapitalize="none"
+          blurOnSubmit={false}
           onSubmitEditing={handleNextInput}
           onChangeText={(value: string) => handleChange('name', value)}
         />
@@ -70,6 +73,9 @@ function Register({navigation}: Props) {
           style={styles.input}
           value={values.email}
           returnKeyType="next"
+          autoCapitalize="none"
+          keyboardType="email-address"
+          blurOnSubmit={false}
           onSubmitEditing={handleNextInput}
           onChangeText={(value: string) => handleChange('email', value)}
         />
@@ -77,12 +83,15 @@ function Register({navigation}: Props) {
           // https://github.com/callstack/react-native-paper/issues/1453
           // @ts-ignore
           ref={passwordInput}
+          secureTextEntry
           mode="outlined"
           label="Password"
           placeholder="Password"
           style={styles.input}
           value={values.password}
           returnKeyType="next"
+          blurOnSubmit={false}
+          autoCapitalize="none"
           onSubmitEditing={handleNextInput}
           onChangeText={(value: string) => handleChange('password', value)}
         />
@@ -91,10 +100,12 @@ function Register({navigation}: Props) {
           // @ts-ignore
           ref={confirmPasswordInput}
           mode="outlined"
+          secureTextEntry
           label="Confirm password"
           placeholder="Confirm password"
           style={styles.input}
           value={values.passwordConfirmation}
+          autoCapitalize="none"
           returnKeyType="done"
           onChangeText={(value: string) =>
             handleChange('passwordConfirmation', value)
@@ -102,13 +113,13 @@ function Register({navigation}: Props) {
         />
       </ScrollView>
       <View style={styles.buttonWrapper}>
-        {registerError && (
-          <HelperText type="error">{registerError.message}</HelperText>
+        {error && (
+          <HelperText type="error">{error.message}</HelperText>
         )}
         <Button
           mode="contained"
           style={styles.button}
-          loading={registerLoading}
+          loading={loading}
           onPress={handleRegister}>
           Register
         </Button>
