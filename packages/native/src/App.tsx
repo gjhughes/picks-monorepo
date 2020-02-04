@@ -2,7 +2,6 @@ import React, {useState, useEffect} from 'react'
 import {StatusBar} from 'react-native'
 import {ApolloProvider} from '@apollo/react-hooks'
 import {Provider as PaperProvier} from 'react-native-paper'
-import {useQuery} from 'react-apollo'
 import codePush, {CodePushOptions} from 'react-native-code-push'
 import Reactotron from 'reactotron-react-native'
 import AsyncStorage from "@react-native-community/async-storage"
@@ -13,8 +12,8 @@ import RootNavigation from './navigation'
 import theme from './theme'
 import {getItem} from './utils/keychain'
 import {AppRoute} from './navigation/enums'
-import teamRecordQuery from './apollo/queries/teamStandings'
 import writeToCache from './apollo/helpers/writeToCache'
+import {useTeamStandingsQuery} from "./generated/hooks"
 
 Reactotron
   .setAsyncStorageHandler(AsyncStorage)
@@ -30,8 +29,7 @@ function App() {
   const [loading, setLoading] = useState(true)
   const [credentials, setCredentials] = useState('')
 
-  // todo: move to hook
-  const {data} = useQuery(teamRecordQuery, {
+  const {data} = useTeamStandingsQuery({
     variables: {season: '2019'},
     client
   })
