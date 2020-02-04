@@ -1,33 +1,25 @@
 import React, {useState, useCallback} from 'react'
 import {FlatList, View} from 'react-native'
-import {useFocusEffect} from '@react-navigation/native'
 import {ActivityIndicator} from 'react-native-paper'
-import {useQuery} from 'react-apollo'
-
-import {colors} from '../../theme'
-import {IUser} from '../../types/User'
-import {ILeague} from '../../types/League'
-import getUserQuery from '../../apollo/queries/getUser'
-import {AppRoute} from '../../navigation/enums'
-import userIsLeagueMember from '../../helpers/userIsLeagueMember'
-import {useLoggedInUser} from '../../apollo/hooks'
-import writeToCache from '../../apollo/helpers/writeToCache'
-import {LeagueTile, FloatingAction, EmptyLeagueList} from '../../ui-components'
+import {useFocusEffect} from '@react-navigation/native'
 
 import styles from './styles'
+import {colors} from '../../theme'
+import {League} from  "../../generated/types"
+import {AppRoute} from '../../navigation/enums'
+import {useLoggedInUser} from '../../apollo/hooks'
+import {useGetUserQuery} from  "../../generated/hooks"
+import writeToCache from '../../apollo/helpers/writeToCache'
+import userIsLeagueMember from '../../helpers/userIsLeagueMember'
+import {LeagueTile, FloatingAction, EmptyLeagueList} from '../../ui-components'
 
-interface UserData {
-  user: IUser
-}
-
-// todo: types
-function MyLeagues({navigation}: any) {
+// todo: navigation types
+function MyLeagues({ navigation}: any) {
   const [floatingActionVisible, setFloatingActionVisible] = useState(true)
 
   const {loggedInUser} = useLoggedInUser()
 
-  // todo: move to hook
-  const {data, loading} = useQuery<UserData>(getUserQuery, {
+  const {data, loading} = useGetUserQuery({
     variables: {
       uuid: loggedInUser
     }
@@ -42,7 +34,7 @@ function MyLeagues({navigation}: any) {
     }, [])
   )
 
-  function renderItem({item}: {item: ILeague}) {
+  function renderItem({item}: {item: League}) {
     const isMember = userIsLeagueMember(loggedInUser, item)
     return (
       <LeagueTile
@@ -54,7 +46,7 @@ function MyLeagues({navigation}: any) {
     )
   }
 
-  function goToLeagueTabs(league: ILeague) {
+  function goToLeagueTabs(league: League) {
     writeToCache('leagueId', league.uuid)
     navigation.navigate(AppRoute.LEAGUE_TABS, {league})
   }
@@ -75,25 +67,28 @@ function MyLeagues({navigation}: any) {
     )
   }
 
-  return (
-    <>
-      {data && (
-        <FlatList<ILeague>
-          style={styles.list}
-          data={data.user.leagues}
-          renderItem={renderItem}
-          keyExtractor={({uuid}) => String(uuid)}
-          ListFooterComponent={<View style={styles.listFooter} />}
-          ListEmptyComponent={<EmptyLeagueList />}
+  if (data) {
+    const {leagues} = data.user
+    return (
+      <>
+        {leagues.length > 0 && (
+          <FlatList<League>
+            style={styles.list}
+            data={leagues as League[]}
+            renderItem={renderItem}
+            keyExtractor={({uuid}) => String(uuid)}
+            ListFooterComponent={<View style={styles.listFooter} />}
+            ListEmptyComponent={<EmptyLeagueList />}
+          />
+        )}
+        <FloatingAction
+          // @ts-ignore
+          onPress={goToModalStack}
+          visible={floatingActionVisible}
         />
-      )}
-      <FloatingAction
-        // @ts-ignore
-        onPress={goToModalStack}
-        visible={floatingActionVisible}
-      />
-    </>
-  )
+      </>
+    )
+  }
 }
 
 export default MyLeagues

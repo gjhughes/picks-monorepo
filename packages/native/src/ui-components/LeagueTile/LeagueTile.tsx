@@ -9,12 +9,12 @@ import {
   Divider
 } from 'react-native-paper'
 
+import {League, User} from "../../generated/types"
+
 import styles from './styles'
-import {User} from '../../types/User'
-import {ILeague} from '../../types/League'
 
 interface Props {
-  league: ILeague
+  league: League
   onPress?: () => void
   isMyLeaguesList?: boolean
   loading?: boolean

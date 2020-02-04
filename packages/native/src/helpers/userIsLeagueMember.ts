@@ -1,6 +1,6 @@
-import {ILeague} from '../types/League'
+import {League} from "../generated/types"
 
-function userIsLeagueMember(user: string, league?: ILeague) {
+function userIsLeagueMember(user: string, league?: League) {
   return (
     league?.members.filter((member) => {
       return member.uuid === user
