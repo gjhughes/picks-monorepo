@@ -2,11 +2,10 @@ import React, {useState} from 'react'
 import {SafeAreaView, View} from 'react-native'
 import {TextInput, Button} from 'react-native-paper'
 import {NavigationStackProp} from 'react-navigation-stack'
-import {useMutation} from '@apollo/react-hooks'
-
-import createLeagueMutation from '../../apollo/mutations/createLeague'
-import styles from './styles'
 import {ScrollView} from 'react-native-gesture-handler'
+
+import styles from './styles'
+import {useCreateLeagueMutation} from "../../generated/hooks"
 
 interface Props {
   navigation: NavigationStackProp
@@ -14,7 +13,10 @@ interface Props {
 
 function NewLeague({navigation}: Props) {
   const [leagueName, setLeagueName] = useState<string>('')
-  const [createLeague, {loading, error}] = useMutation(createLeagueMutation, {
+  const [createLeague, {
+    loading,
+    error
+  }] = useCreateLeagueMutation({
     variables: {name: leagueName},
     refetchQueries: ['GetUser']
   })
@@ -22,8 +24,7 @@ function NewLeague({navigation}: Props) {
   function handleCreateLeague() {
     createLeague().then(({data}) => {
       navigation.navigate('NewLeagueSuccess', {
-        league: data.createLeague,
-        leagueCode: data.createLeague.accessCode
+        league: data?.createLeague
       })
     })
   }

@@ -8,8 +8,9 @@ import {LeagueCodeTile} from '../../ui-components'
 
 import styles from './styles'
 
+// todo: navigation types
 function NewLeagueSuccess({navigation, route}: any) {
-  const {league, leagueCode} = route.params
+  const {league} = route.params
   const [snackVisible, setSnackVisible] = useState<boolean>(false)
 
   function copyLeagueCode() {
@@ -31,7 +32,7 @@ function NewLeagueSuccess({navigation, route}: any) {
         </Subheading>
       </View>
       <LeagueCodeTile
-        leagueCode={leagueCode}
+        leagueCode={league.accessCode}
         onCopyLeagueCode={copyLeagueCode}
         onNavigate={handleNavigateToLeague}
       />

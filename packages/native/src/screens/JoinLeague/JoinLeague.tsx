@@ -8,11 +8,13 @@ import {
 } from 'react-native-paper'
 import {NavigationStackProp} from 'react-navigation-stack'
 
-import {useAccessLeague, useJoinLeague, useLoggedInUser} from '../../apollo/hooks'
 import writeToCache from "../../apollo/helpers/writeToCache"
 import LeagueTile from '../../ui-components/LeagueTile'
 import {AppRoute} from "../../navigation/enums"
 import userIsLeagueMember from "../../helpers/userIsLeagueMember"
+
+import {League} from "../../generated/types"
+import {useAccessLeagueLazyQuery, useLoggedInUserQuery, useJoinLeagueMutation} from "../../generated/hooks"
 
 import styles from './styles'
 
@@ -24,43 +26,49 @@ function JoinLeague({navigation}: Props) {
   const [code, setCode] = useState<string>('')
   const [isMember, setIsMember] = useState(false)
 
-  const {loggedInUser} = useLoggedInUser()
+  const {data: localData} = useLoggedInUserQuery()
 
-  const {
-    getLeagueByAccessCode,
-    accessLeagueData,
-    accessLeagueLoading,
-    accessLeagueError
-  } = useAccessLeague()
+  const [getLeagueByCode, {
+    data: accessLeagueData,
+    loading: accessLoading,
+    error: accessError
+  }] = useAccessLeagueLazyQuery()
 
-  const {joinLeague, joinLeagueLoading, joinLeagueError} = useJoinLeague()
+  const [joinLeague, {
+    loading: joinLoading,
+    error: joinError
+  }] = useJoinLeagueMutation()
 
   useEffect(() => {
-    setIsMember(userIsLeagueMember(loggedInUser, accessLeagueData))
-  }, [accessLeagueData])
+    if (accessLeagueData?.accessLeague) {
+      setIsMember(userIsLeagueMember(localData?.loggedInUser!, accessLeagueData?.accessLeague as League))
+    }
+  }, [accessLeagueData?.accessLeague])
 
   const handleViewOrJoinLeague = () => {
-    if (isMember) {
-      writeToCache("leagueId", accessLeagueData.uuid)
-      navigation.navigate(AppRoute.LEAGUE_TABS, {
-        league: accessLeagueData
-      })
-    } else {
-      joinLeague({
-        variables: {
-          leagueId: accessLeagueData?.uuid
-        }
-      }).then(() => {
-        writeToCache("leagueId", accessLeagueData.uuid)
+    if (accessLeagueData?.accessLeague) {
+      if (isMember) {
+        writeToCache("leagueId", accessLeagueData?.accessLeague?.uuid)
         navigation.navigate(AppRoute.LEAGUE_TABS, {
           league: accessLeagueData
         })
-      })
+      } else {
+        joinLeague({
+          variables: {
+            leagueId: accessLeagueData?.accessLeague.uuid
+          }
+        }).then(() => {
+          writeToCache("leagueId", accessLeagueData?.accessLeague!.uuid)
+          navigation.navigate(AppRoute.LEAGUE_TABS, {
+            league: accessLeagueData
+          })
+        })
+      }
     }
   }
 
   const handleAccessLeague = () => {
-    getLeagueByAccessCode({
+    getLeagueByCode({
       variables: {
         accessCode: code
       }
@@ -80,19 +88,19 @@ function JoinLeague({navigation}: Props) {
           style={styles.input}
           onChangeText={setCode}
         />
-        <HelperText type="error" visible={!!accessLeagueError}>
+        <HelperText type="error" visible={!!accessError}>
           Couldn't find a league that matches that code
         </HelperText>
-        {accessLeagueData && (
+        {accessLeagueData?.accessLeague && (
           <>
             <LeagueTile
               isMember={isMember}
-              loading={joinLeagueLoading}
-              league={accessLeagueData}
+              loading={joinLoading}
+              league={accessLeagueData?.accessLeague as League}
               onPress={handleViewOrJoinLeague}
             />
-            {joinLeagueError && (
-              <HelperText>{joinLeagueError.message}</HelperText>
+            {joinError && (
+              <HelperText>{joinError.message}</HelperText>
             )}
           </>
         )}
@@ -103,7 +111,7 @@ function JoinLeague({navigation}: Props) {
           icon="arrow-right"
           style={styles.button}
           disabled={code.length < 6}
-          loading={accessLeagueLoading}
+          loading={accessLoading}
           onPress={handleAccessLeague}>
           Search
         </Button>
