@@ -10,13 +10,13 @@ import Leaderboard from './schema/leaderboard'
 export default gql`
   type Query {
     user(uuid: String!): User!
-    league(uuid: String!): League
+    league(uuid: String!): League!
     leagues: [League]!
-    weeklySchedule(season: String!, week: String!): [WeeklySchedule]
+    weeklySchedule(season: String!, week: String!): [WeeklySchedule!]!
     accessLeague(accessCode: String!): League
-    predictionsForWeek(leagueId: String!, week: Int!, stage: String!, season: String!): [Prediction]
-    teamStandings(season: String!): [TeamRecord]
-    leaderboard(leagueId: String!): Leaderboard
+    predictionsForWeek(leagueId: String!, week: Int!, stage: String!, season: String!): [Prediction]!
+    teamStandings(season: String!): [TeamRecord!]!
+    leaderboard(leagueId: String!): Leaderboard!
   }
 
   type Mutation {
@@ -24,7 +24,7 @@ export default gql`
     register(name: String!, email: String!, password: String!, passwordConfirmation: String!): Auth!
     createLeague(name: String!): League!
     joinLeague(leagueId: String!): League!
-    upsertPrediction(leagueId: String!, week: Int!, gameKey: String!, predictedWinner: Int!, stage: String!, season: String!): [Prediction]
+    upsertPrediction(leagueId: String!, week: Int!, gameKey: String!, predictedWinner: Int!, stage: String!, season: String!): [Prediction!]!
   }
 
   ${Auth}
