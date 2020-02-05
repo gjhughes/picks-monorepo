@@ -8,6 +8,7 @@ import {TopTabs, ScheduleList, HeaderTitle, Dialog} from '../../ui-components'
 import {Tab as TabType} from '../../ui-components/TopTabs/types'
 import {getCurrentSeason} from '../../helpers/getCurrentSeason'
 import {useLocalLeagueIdQuery, useWeeklyScheduleQuery, useUpsertPredictionMutation, usePredictionsForWeekQuery} from "../../generated/hooks"
+import {WeeklySchedule, Prediction} from "../../generated/types"
 
 // temp
 const initialActiveTab = {weekName: "Divisional", stage: "POST", weekNumber: 4, index: 21}
@@ -50,11 +51,8 @@ function LeagueSchedule({navigation, route}: any) {
   function handlePrediction(gameKey: string, predictedWinner: number) {
     const game = scheduleData?.weeklySchedule!.find(
       // todo: fix data type
-      (data: any) => data!.gameKey! === gameKey
+      (data: WeeklySchedule) => data.gameKey === gameKey
     )
-    // const game = scheduleData?.weeklySchedule.find(
-    //   (data: WeeklySchedule) => data.gameKey === gameKey
-    // )
 
     // if (game?.status === 'Final') {
     //   return null
@@ -122,7 +120,7 @@ function LeagueSchedule({navigation, route}: any) {
         <ScheduleList
           refetch={refetch}
           isMatchUpdating={isMatchUpdating}
-          predictions={predictionData?.predictionsForWeek || []}
+          predictions={predictionData?.predictionsForWeek as Prediction[] || []}
           onPrediction={handlePrediction}
           games={scheduleData?.weeklySchedule!}
           isFetching={isFetching()}

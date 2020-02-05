@@ -5,16 +5,16 @@ import {ApolloQueryResult} from 'apollo-client'
 import styles from './styles'
 import {Empty} from './Empty'
 import MatchRow from '../MatchRow'
-import {Game, WeeklySchedule} from '../../apollo/types'
-import {Prediction} from '../../types/Prediction'
+import {Prediction, WeeklySchedule} from "../../generated/types"
+import {WeeklyScheduleQuery} from "../../generated/hooks"
 
 interface Props {
-  games: Game[]
+  games: WeeklySchedule[]
   isFetching: boolean
   predictions: Prediction[]
   isMatchUpdating: string | null
   onPrediction(gameId: string, teamId: number): void
-  refetch(): Promise<ApolloQueryResult<WeeklySchedule>>
+  refetch(): Promise<ApolloQueryResult<WeeklyScheduleQuery>>
 }
 
 const renderItem = ({
@@ -28,7 +28,7 @@ const renderItem = ({
       game={item}
       isMatchUpdating={isMatchUpdating}
       predictions={predictions.find(
-        (game: Game) => game.gameKey === item.gameKey
+        (game: WeeklySchedule) => game.gameKey === item.gameKey
       )}
       onPrediction={onPrediction}
     />
@@ -55,7 +55,7 @@ function ScheduleList({
   }
 
   return (
-    <FlatList<Game>
+    <FlatList<WeeklySchedule>
       data={games}
       refreshing={isFetching}
       style={styles.container}
