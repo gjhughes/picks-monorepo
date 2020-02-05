@@ -39,7 +39,7 @@ function LeagueLeaderboard() {
             <Title>
               Weekly
             </Title>
-            {leaderboard!.weeks!.map(({week, results}: any) => {
+            {leaderboard.weeks.map(({week, results}: any) => {
               return <LeaderboardTable key={week} results={results} />
             })}
           </>
