@@ -4,16 +4,17 @@ import {ActivityIndicator, IconButton, Snackbar} from 'react-native-paper'
 
 import styles from './styles'
 import {colors} from '../../theme'
-import {Game} from '../../apollo/types'
 import {TopTabs, ScheduleList, HeaderTitle, Dialog} from '../../ui-components'
 import {Tab as TabType} from '../../ui-components/TopTabs/types'
-import {useWeeklyScheduleQuery, useMakePredictionMutation, usePredictionsForWeekQuery, useLeagueId} from '../../apollo/hooks'
+import {getCurrentSeason} from '../../helpers/getCurrentSeason'
+import {useLocalLeagueIdQuery, useWeeklyScheduleQuery, useUpsertPredictionMutation, usePredictionsForWeekQuery} from "../../generated/hooks"
 
 // temp
 const initialActiveTab = {weekName: "Divisional", stage: "POST", weekNumber: 4, index: 21}
 
+// todo: navigation types
 function LeagueSchedule({navigation, route}: any) {
-  const {leagueId} = useLeagueId()
+  const {data: localData} = useLocalLeagueIdQuery()
   const [dialogVisible, setDialogVisible] = useState(false)
   const [snackVisible, setSnackVisible] = useState(false)
   const [activeTab, setActiveTab] = useState<TabType>(initialActiveTab)
@@ -21,21 +22,39 @@ function LeagueSchedule({navigation, route}: any) {
 
   const league = route?.params?.league
 
-  const {makePrediction} = useMakePredictionMutation(leagueId, "2019", activeTab.stage, activeTab.weekNumber)
+  const [upsetPrediction] = useUpsertPredictionMutation()
 
   const {
     refetch,
-    scheduleData,
+    data: scheduleData,
     networkStatus,
-    scheduleLoading
-  } = useWeeklyScheduleQuery(activeTab.stage, activeTab.weekNumber)
+    loading: scheduleLoading
+  } = useWeeklyScheduleQuery({
+    variables: {
+      season: `${getCurrentSeason()}${activeTab.stage}`,
+      week: activeTab.weekNumber.toString()
+    },
+    fetchPolicy: 'cache-first',
+    notifyOnNetworkStatusChange: true
+  })
 
-  const {predictionData, predictionsLoading} = usePredictionsForWeekQuery(leagueId, "2019", activeTab.stage, activeTab.weekNumber)
+  const {data: predictionData, loading: predictionsLoading} = usePredictionsForWeekQuery({
+    variables: {
+      leagueId: localData?.leagueId!,
+      season: "2019",
+      stage: activeTab.stage,
+      week: activeTab.weekNumber
+    }
+  })
 
   function handlePrediction(gameKey: string, predictedWinner: number) {
-    const game = scheduleData?.weeklySchedule.find(
-      (data: Game) => data.gameKey === gameKey
+    const game = scheduleData?.weeklySchedule!.find(
+      // todo: fix data type
+      (data: any) => data!.gameKey! === gameKey
     )
+    // const game = scheduleData?.weeklySchedule.find(
+    //   (data: WeeklySchedule) => data.gameKey === gameKey
+    // )
 
     // if (game?.status === 'Final') {
     //   return null
@@ -45,14 +64,14 @@ function LeagueSchedule({navigation, route}: any) {
 
     const variables = {
         gameKey,
-        leagueId,
+        leagueId: localData?.leagueId!,
         season: "2019",
         predictedWinner,
         week: activeTab.weekNumber,
         stage: activeTab.stage
     }
 
-    makePrediction({variables}).then(() => {
+    upsetPrediction({variables}).then(() => {
       setIsMatchUpdating(null)
     })
   }
@@ -105,7 +124,7 @@ function LeagueSchedule({navigation, route}: any) {
           isMatchUpdating={isMatchUpdating}
           predictions={predictionData?.predictionsForWeek || []}
           onPrediction={handlePrediction}
-          games={scheduleData.weeklySchedule}
+          games={scheduleData?.weeklySchedule!}
           isFetching={isFetching()}
         />
       )}
