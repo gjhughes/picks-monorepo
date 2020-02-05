@@ -3,50 +3,50 @@ import {ScrollView, RefreshControl} from 'react-native'
 import {ActivityIndicator, Title} from 'react-native-paper'
 
 import styles from './styles'
-import {useLeaderboard, useLeagueId} from '../../apollo/hooks'
 import {LeaderboardTable} from '../../ui-components'
-import { NetworkStatus } from 'apollo-client'
+import {NetworkStatus} from 'apollo-client'
+import {useLocalLeagueIdQuery, useLeaderboardQuery} from "../../generated/hooks"
+import {UserScore} from "../../generated/types"
 
-function Leaderboard() {
-  const {leagueId} = useLeagueId()
-  const {
-    leaderboardLoading,
-    leaderboardData,
-    refetch,
-    networkStatus
-  } = useLeaderboard(leagueId)
+function LeagueLeaderboard() {
+  const {data: localData} = useLocalLeagueIdQuery()
 
-  if (leaderboardLoading) {
+  const {data: leaderboardData, loading, networkStatus, refetch} = useLeaderboardQuery({
+    variables: {
+      leagueId: localData?.leagueId!
+    }
+  })
+
+  if (loading) {
     return <ActivityIndicator size="large" style={styles.activityIndicator} />
   }
 
   const refreshing = networkStatus ===  NetworkStatus.refetch || networkStatus === NetworkStatus.loading
 
-  return (
-    <ScrollView
-      contentContainerStyle={styles.container}
-      showsVerticalScrollIndicator={false}
-      refreshControl={<RefreshControl onRefresh={refetch} refreshing={refreshing} />}>
-      {leaderboardData?.overall && (
-        <>
-          <Title style={styles.titleText}>
-            Overall
-          </Title>
-          <LeaderboardTable overallScore results={leaderboardData?.overall} />
-        </>
-      )}
-      {leaderboardData?.weeks && (
-        <Title style={styles.titleText}>
-          Weekly
-        </Title>
-      )}
-      {leaderboardData?.weeks?.map(({week, results}) => {
-        return (
-          <LeaderboardTable key={week} week={week} results={results} />
-        )
-      })}
-    </ScrollView>
-  )
+  if (leaderboardData?.leaderboard) {
+    const {leaderboard} = leaderboardData
+    return (
+      <ScrollView
+        contentContainerStyle={styles.container}
+        showsVerticalScrollIndicator={false}
+        refreshControl={<RefreshControl onRefresh={refetch} refreshing={refreshing} />}>
+        {leaderboard.overall && leaderboard.overall.length > 0 && (
+          <>
+            <Title style={styles.titleText}>
+              Overall
+            </Title>
+            <LeaderboardTable overallScore results={leaderboardData?.leaderboard.overall as UserScore[]} />
+            <Title>
+              Weekly
+            </Title>
+            {leaderboard!.weeks!.map(({week, results}: any) => {
+              return <LeaderboardTable key={week} results={results} />
+            })}
+          </>
+        )}
+      </ScrollView>
+    )
+  }
 }
 
-export default Leaderboard
+export default LeagueLeaderboard
