@@ -1,4 +1,4 @@
-schema: https://picks-graph.ghughes.now.sh/
+schema: https://graph.ghughes.now.sh
 generates:
   packages/native/src/generated/hooks.ts:
     documents: packages/native/src/apollo/**/*.ts
