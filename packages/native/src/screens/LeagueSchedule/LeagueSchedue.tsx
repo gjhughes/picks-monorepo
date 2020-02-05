@@ -23,7 +23,9 @@ function LeagueSchedule({navigation, route}: any) {
 
   const league = route?.params?.league
 
-  const [upsetPrediction] = useUpsertPredictionMutation()
+  const [upsetPrediction] = useUpsertPredictionMutation({
+    refetchQueries: ["PredictionsForWeek"]
+  })
 
   const {
     refetch,
