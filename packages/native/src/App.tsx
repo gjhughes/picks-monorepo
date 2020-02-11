@@ -5,6 +5,7 @@ import {Provider as PaperProvier} from 'react-native-paper'
 import codePush, {CodePushOptions} from 'react-native-code-push'
 import Reactotron from 'reactotron-react-native'
 import AsyncStorage from "@react-native-community/async-storage"
+import BootSplash from "react-native-bootsplash"
 
 import client from './apollo'
 import {BootScreen} from './screens'
@@ -45,6 +46,7 @@ function App() {
         setCredentials(credentials.username)
       }
       setLoading(false)
+      BootSplash.hide({duration: 500})
     })
   }
 
@@ -56,7 +58,7 @@ function App() {
     <ApolloProvider client={client}>
       <PaperProvier theme={theme}>
         <StatusBar barStyle="light-content" />
-        {loading || (!data && <BootScreen />)}
+        {loading || !data && <BootScreen />}
         {!loading && data && (
           <RootNavigation initialRouteName={initialRouteName} />
         )}
