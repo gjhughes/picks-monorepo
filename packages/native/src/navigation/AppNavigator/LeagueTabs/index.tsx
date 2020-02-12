@@ -8,7 +8,7 @@ import {IconButton} from 'react-native-paper'
 
 import ScheduleStack from './ScheduleStack'
 import LeaderboardSack from './LeaderboardStack'
-import {colors} from '../../../theme'
+import {colors, layout} from '../../../theme'
 
 const Tabs = createBottomTabNavigator()
 
@@ -29,6 +29,10 @@ const getScreenOptions = ({route}: any): BottomTabNavigationOptions => {
 
 const getTabBarOptions = (): BottomTabBarOptions => {
   return {
+    style: {
+      ...layout.shadow,
+      shadowRadius: 3
+    },
     activeTintColor: colors.nfl.primary
   }
 }
