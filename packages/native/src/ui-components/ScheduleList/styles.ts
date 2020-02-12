@@ -17,7 +17,7 @@ export default StyleSheet.create<Styles>({
     paddingHorizontal: layout.padding
   },
   contentContainer: {
-    overflow: 'hidden',
-    flexGrow: 1
+    flexGrow: 1,
+    paddingBottom: 10
   }
 })

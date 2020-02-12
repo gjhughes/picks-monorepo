@@ -56,9 +56,9 @@ function LeagueSchedule({navigation, route}: any) {
       (data: WeeklySchedule) => data.gameKey === gameKey
     )
 
-    // if (game?.status === 'Final') {
-    //   return null
-    // }
+    if (game?.status === 'Final') {
+      return null
+    }
 
     setIsMatchUpdating(gameKey)
 

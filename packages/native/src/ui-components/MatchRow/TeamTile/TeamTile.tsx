@@ -42,15 +42,15 @@ function TeamTile({
         <Record wins={wins} losses={losses} ties={ties} />
       </View>
       <View style={[footer, {backgroundColor: footerColor}]}>
-        {/* {!preGame ? (
+        {!preGame ? (
           <Score score={score} />
-        ) : ( */}
-        <Predictions
-          gameKey={gameKey}
-          teamId={teamId}
-          predictions={predictions}
-        />
-        {/* )} */}
+        ) : (
+          <Predictions
+            gameKey={gameKey}
+            teamId={teamId}
+            predictions={predictions}
+          />
+        )}
       </View>
     </Card>
   )
