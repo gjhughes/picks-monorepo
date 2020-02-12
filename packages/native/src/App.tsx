@@ -36,6 +36,7 @@ function App() {
   })
 
   useEffect(() => {
+    BootSplash.hide({duration: 500})
     getAuthCrednetials()
   }, [])
 
